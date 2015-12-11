@@ -1,9 +1,15 @@
 package com.theironyard;
 
+import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.User;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -12,6 +18,13 @@ import java.util.HashMap;
 @RestController
 public class ApiSpringController {
     static final String SAMPLE_URL = "http://gturnquist-quoters.cfapps.io/api/random";
+
+    Facebook facebook;
+
+    @Inject
+    public ApiSpringController(Facebook facebook) {
+        this.facebook = facebook;
+    }
 
     @RequestMapping("/quote")
     public HashMap getQuote() {
@@ -24,4 +37,17 @@ public class ApiSpringController {
         }
         return result;
     }
+// /profile
+    @RequestMapping("/profile")
+    public User getUser(HttpServletResponse response) throws IOException {
+        try {
+            User user = facebook.userOperations().getUserProfile();
+            return user;
+        } catch (Exception e) {
+            response.sendRedirect("/connect/facebook");
+        }
+
+        return null;
+    }
+
 }
